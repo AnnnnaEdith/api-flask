@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -31,37 +31,52 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch('https://api-flask-gmko.onrender.com/documentos/contenido/${notebookName}')
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar únicamente los resultados y las celdas de Markdown
+            // Mostrar el contenido de las celdas
             data.forEach(cell => {
-                if (cell.tipo === 'texto') {
-                    // Celda de Markdown
-                    const markdownDiv = document.createElement('div');
-                    markdownDiv.innerHTML = `<div><strong>Markdown:</strong></div><pre>${cell.contenido}</pre>`;
-                    contentDiv.appendChild(markdownDiv);
-                } else if (cell.tipo === 'código') {
-                    // Mostrar únicamente las salidas de las celdas de código
+                const cellDiv = document.createElement('div');
+                if (cell.tipo === 'código') {
+                    cellDiv.innerHTML = `
+                        <strong>Celda de Código:</strong>
+                        <pre>${cell.contenido}</pre>
+                    `;
+
+                    // Mostrar las salidas
                     cell.salidas.forEach(salida => {
-                        const salidaDiv = document.createElement('div');
-
                         if (salida.tipo === 'texto') {
-                            salidaDiv.innerHTML = `<div><strong>Salida (Texto):</strong></div><pre>${salida.contenido}</pre>`;
+                            cellDiv.innerHTML += `
+                                <strong>Salida (Texto):</strong>
+                                <pre>${salida.contenido}</pre>
+                            `;
                         } else if (salida.tipo === 'imagen') {
-                            salidaDiv.innerHTML = `<div><strong>Salida (Imagen):</strong></div><img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>`;
+                            cellDiv.innerHTML += `
+                                <strong>Salida (Imagen):</strong>
+                                <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>
+                            `;
                         } else if (salida.tipo === 'json') {
-                            salidaDiv.innerHTML = `<div><strong>Salida (JSON):</strong></div><pre>${JSON.stringify(salida.contenido, null, 2)}</pre>`;
+                            cellDiv.innerHTML += `
+                                <strong>Salida (JSON):</strong>
+                                <pre>${JSON.stringify(salida.contenido, null, 2)}</pre>
+                            `;
                         } else if (salida.tipo === 'html') {
-                            salidaDiv.innerHTML = `<div><strong>Salida (HTML):</strong></div><div>${salida.contenido}</div>`;
+                            cellDiv.innerHTML += `
+                                <strong>Salida (HTML):</strong>
+                                <div>${salida.contenido}</div>
+                            `;
                         }
-
-                        contentDiv.appendChild(salidaDiv);
                     });
+                } else if (cell.tipo === 'texto') {
+                    cellDiv.innerHTML = `
+                        <strong>Celda de Markdown:</strong>
+                        <pre>${cell.contenido}</pre>
+                    `;
                 }
+                contentDiv.appendChild(cellDiv);
             });
         })
         .catch(error => {
