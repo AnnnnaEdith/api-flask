@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -36,11 +36,17 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch(`https://api-flask-gmko.onrender.comdocumentos/contenido/${notebookName}`)
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
+
+            // Verificamos que la respuesta contiene celdas
+            if (!Array.isArray(data)) {
+                contentDiv.innerHTML = '<p>No se encontraron datos o el formato es incorrecto.</p>';
+                return;
+            }
 
             // Título del notebook cargado
             const titleDiv = document.createElement('div');
@@ -49,15 +55,19 @@ function fetchNotebookContent(notebookName) {
             `;
             contentDiv.appendChild(titleDiv);
 
-            // Procesar las celdas
+            let foundAccuracy = false;
+            let foundDataInfo = false;
+
+            // Procesamos cada celda
             data.forEach(cell => {
+                // Verificamos la existencia de tipo 'código' o 'texto'
                 if (cell.tipo === 'código') {
-                    // Mostrar las salidas relevantes, específicamente para el notebook "Árboles de decisión"
+                    // Si hay salidas, procesamos cada tipo de salida
                     cell.salidas.forEach(salida => {
                         if (salida.tipo === 'texto') {
-                            // Mostrar resultados de accuracy
-                            const accuracyDiv = document.createElement('div');
+                            // Buscamos si el texto contiene "accuracy"
                             if (salida.contenido.toLowerCase().includes("accuracy")) {
+                                const accuracyDiv = document.createElement('div');
                                 accuracyDiv.innerHTML = `
                                     <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
                                         <h3 style="color: #4CAF50;">Exactitud (Accuracy)</h3>
@@ -65,9 +75,10 @@ function fetchNotebookContent(notebookName) {
                                     </div>
                                 `;
                                 contentDiv.appendChild(accuracyDiv);
+                                foundAccuracy = true;
                             }
 
-                            // Mostrar cantidad de datos
+                            // Buscamos la cantidad de datos
                             if (salida.contenido.toLowerCase().includes("datos") || salida.contenido.toLowerCase().includes("shape")) {
                                 const dataSizeDiv = document.createElement('div');
                                 dataSizeDiv.innerHTML = `
@@ -77,9 +88,10 @@ function fetchNotebookContent(notebookName) {
                                     </div>
                                 `;
                                 contentDiv.appendChild(dataSizeDiv);
+                                foundDataInfo = true;
                             }
                         } else if (salida.tipo === 'imagen') {
-                            // Mostrar gráficos generados
+                            // Si la salida es una imagen (gráfico), la mostramos
                             const imageDiv = document.createElement('div');
                             imageDiv.innerHTML = `
                                 <div style="text-align: center; margin: 10px 0;">
@@ -92,6 +104,28 @@ function fetchNotebookContent(notebookName) {
                     });
                 }
             });
+
+            // Si no se encuentra ninguno de los datos, informamos al usuario
+            if (!foundAccuracy) {
+                const noAccuracyDiv = document.createElement('div');
+                noAccuracyDiv.innerHTML = `
+                    <div style="background-color: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                        <h3 style="color: #856404;">No se encontró información de Accuracy.</h3>
+                    </div>
+                `;
+                contentDiv.appendChild(noAccuracyDiv);
+            }
+
+            if (!foundDataInfo) {
+                const noDataInfoDiv = document.createElement('div');
+                noDataInfoDiv.innerHTML = `
+                    <div style="background-color: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                        <h3 style="color: #856404;">No se encontró información de cantidad de datos.</h3>
+                    </div>
+                `;
+                contentDiv.appendChild(noDataInfoDiv);
+            }
+
         })
         .catch(error => {
             console.error('Error al obtener el contenido del notebook:', error);
