@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -36,7 +36,7 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch(`https://api-flask-gmko.onrender.com/documentos/contenido/${notebookName}`)
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
@@ -65,6 +65,18 @@ function fetchNotebookContent(notebookName) {
                                     </div>
                                 `;
                                 contentDiv.appendChild(accuracyDiv);
+                            }
+
+                            // Mostrar cantidad de datos
+                            if (salida.contenido.toLowerCase().includes("datos") || salida.contenido.toLowerCase().includes("shape")) {
+                                const dataSizeDiv = document.createElement('div');
+                                dataSizeDiv.innerHTML = `
+                                    <div style="background-color: #f1f1f1; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #FF5722;">Cantidad de Datos</h3>
+                                        <p>${salida.contenido}</p>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(dataSizeDiv);
                             }
                         } else if (salida.tipo === 'imagen') {
                             // Mostrar gráficos generados
