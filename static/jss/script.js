@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -21,6 +21,11 @@ function fetchNotebooksList() {
                 const li = document.createElement('li');
                 li.textContent = notebook;
                 li.onclick = () => fetchNotebookContent(notebook);
+                li.style.cursor = 'pointer';
+                li.style.margin = '10px 0';
+                li.style.fontSize = '16px';
+                li.style.color = '#007BFF';
+                li.style.textDecoration = 'underline';
                 notebooksList.appendChild(li);
             });
         })
@@ -31,41 +36,45 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch(`https://api-flask-gmko.onrender.com/documentos/contenido/${notebookName}`)
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar solo las salidas y celdas de texto
+            // Procesar las celdas
             data.forEach(cell => {
-                if (cell.tipo === 'texto') {
-                    const textCellDiv = document.createElement('div');
-                    textCellDiv.innerHTML = `
-                        <pre>${cell.contenido}</pre>
-                    `;
-                    contentDiv.appendChild(textCellDiv);
-                } else if (cell.tipo === 'código') {
+                if (cell.tipo === 'código') {
+                    // Mostrar solo las salidas relevantes
                     cell.salidas.forEach(salida => {
-                        const outputDiv = document.createElement('div');
-                        if (salida.tipo === 'texto') {
-                            outputDiv.innerHTML = `
-                                <pre>${salida.contenido}</pre>
+                        if (salida.tipo === 'texto' && salida.contenido.includes("accuracy")) {
+                            const accuracyDiv = document.createElement('div');
+                            accuracyDiv.innerHTML = `
+                                <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                    <h3 style="color: #4CAF50;">Resultado de Accuracy</h3>
+                                    <p>${salida.contenido}</p>
+                                </div>
                             `;
+                            contentDiv.appendChild(accuracyDiv);
                         } else if (salida.tipo === 'imagen') {
-                            outputDiv.innerHTML = `
-                                <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>
+                            const imageDiv = document.createElement('div');
+                            imageDiv.innerHTML = `
+                                <div style="text-align: center; margin: 10px 0;">
+                                    <h3 style="color: #2196F3;">Gráfico Generado</h3>
+                                    <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida" style="max-width: 100%; border: 1px solid #ddd; border-radius: 5px; padding: 5px;"/>
+                                </div>
                             `;
-                        } else if (salida.tipo === 'json') {
-                            outputDiv.innerHTML = `
-                                <pre>${JSON.stringify(salida.contenido, null, 2)}</pre>
+                            contentDiv.appendChild(imageDiv);
+                        } else if (salida.tipo === 'texto' && salida.contenido.includes("matriz de confusión")) {
+                            const matrixDiv = document.createElement('div');
+                            matrixDiv.innerHTML = `
+                                <div style="background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                    <h3 style="color: #FF9800;">Matriz de Confusión</h3>
+                                    <p>${salida.contenido}</p>
+                                </div>
                             `;
-                        } else if (salida.tipo === 'html') {
-                            outputDiv.innerHTML = `
-                                <div>${salida.contenido}</div>
-                            `;
+                            contentDiv.appendChild(matrixDiv);
                         }
-                        contentDiv.appendChild(outputDiv);
                     });
                 }
             });
@@ -74,3 +83,4 @@ function fetchNotebookContent(notebookName) {
             console.error('Error al obtener el contenido del notebook:', error);
         });
 }
+
