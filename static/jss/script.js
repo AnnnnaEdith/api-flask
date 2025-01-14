@@ -64,8 +64,8 @@ function fetchNotebookContent(notebookName) {
                     // Si hay salidas, procesamos cada tipo de salida
                     cell.salidas.forEach(salida => {
                         if (salida.tipo === 'texto') {
-                            // Buscamos si el texto contiene "F1-score"
-                            if (salida.contenido.toLowerCase().includes("f1-score")) {
+                            // Buscamos si el texto contiene "f1_score"
+                            if (salida.contenido.toLowerCase().includes("f1_score")) {
                                 const f1scoreDiv = document.createElement('div');
                                 f1scoreDiv.innerHTML = `
                                     <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
