@@ -56,11 +56,10 @@ function fetchNotebookContent(notebookName) {
             contentDiv.appendChild(titleDiv);
 
             let foundF1Score = false;
-            let foundDataInfo = false;
 
             // Procesamos cada celda
             data.forEach(cell => {
-                // Verificamos la existencia de tipo 'código' o 'texto'
+                // Verificamos la existencia de tipo 'código'
                 if (cell.tipo === 'código') {
                     // Si hay salidas, procesamos cada tipo de salida
                     cell.salidas.forEach(salida => {
@@ -70,25 +69,12 @@ function fetchNotebookContent(notebookName) {
                                 const f1scoreDiv = document.createElement('div');
                                 f1scoreDiv.innerHTML = `
                                     <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                        <h3 style="color: #4CAF50;">F1-Score</h3>
+                                        <h3 style="color: #4CAF50;">Resultado F1-Score</h3>
                                         <p>${salida.contenido}</p>
                                     </div>
                                 `;
                                 contentDiv.appendChild(f1scoreDiv);
                                 foundF1Score = true;
-                            }
-
-                            // Buscamos la cantidad de datos
-                            if (salida.contenido.toLowerCase().includes("datos") || salida.contenido.toLowerCase().includes("shape")) {
-                                const dataSizeDiv = document.createElement('div');
-                                dataSizeDiv.innerHTML = `
-                                    <div style="background-color: #f1f1f1; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                        <h3 style="color: #FF5722;">Cantidad de Datos</h3>
-                                        <p>${salida.contenido}</p>
-                                    </div>
-                                `;
-                                contentDiv.appendChild(dataSizeDiv);
-                                foundDataInfo = true;
                             }
                         } else if (salida.tipo === 'imagen') {
                             // Si la salida es una imagen (gráfico), la mostramos
@@ -105,7 +91,7 @@ function fetchNotebookContent(notebookName) {
                 }
             });
 
-            // Si no se encuentra ninguno de los datos, informamos al usuario
+            // Si no se encuentra información de F1-score, informamos al usuario
             if (!foundF1Score) {
                 const noF1ScoreDiv = document.createElement('div');
                 noF1ScoreDiv.innerHTML = `
@@ -114,16 +100,6 @@ function fetchNotebookContent(notebookName) {
                     </div>
                 `;
                 contentDiv.appendChild(noF1ScoreDiv);
-            }
-
-            if (!foundDataInfo) {
-                const noDataInfoDiv = document.createElement('div');
-                noDataInfoDiv.innerHTML = `
-                    <div style="background-color: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                        <h3 style="color: #856404;">No se encontró información de cantidad de datos.</h3>
-                    </div>
-                `;
-                contentDiv.appendChild(noDataInfoDiv);
             }
 
         })
