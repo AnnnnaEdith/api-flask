@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -36,7 +36,7 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch(`https://api-flask-gmko.onrender.com/documentos/contenido/${notebookName}`)
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
@@ -55,17 +55,19 @@ function fetchNotebookContent(notebookName) {
                     // Mostrar las salidas relevantes
                     cell.salidas.forEach(salida => {
                         if (salida.tipo === 'texto') {
-                            // Texto relevante, como el accuracy
-                            const textDiv = document.createElement('div');
-                            textDiv.innerHTML = `
-                                <div style="background-color: #f0f8ff; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                    <h3 style="color: #4CAF50;">Resultado Texto</h3>
-                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${salida.contenido}</pre>
-                                </div>
-                            `;
-                            contentDiv.appendChild(textDiv);
+                            if (notebookName.toLowerCase().includes('analisis-de-sentimiento')) {
+                                // Para análisis de sentimientos, títulos descriptivos
+                                const sentimentTextDiv = document.createElement('div');
+                                sentimentTextDiv.innerHTML = `
+                                    <div style="background-color: #f0f8ff; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #4CAF50;">Resultado de Sentimiento</h3>
+                                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${salida.contenido}</pre>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(sentimentTextDiv);
+                            }
                         } else if (salida.tipo === 'imagen') {
-                            // Imágenes (gráficos generados)
+                            // Gráficas (en formato base64)
                             const imageDiv = document.createElement('div');
                             imageDiv.innerHTML = `
                                 <div style="text-align: center; margin: 10px 0;">
@@ -75,17 +77,29 @@ function fetchNotebookContent(notebookName) {
                             `;
                             contentDiv.appendChild(imageDiv);
                         } else if (salida.tipo === 'json') {
-                            // JSON (formatos de salida complejos)
+                            // Si es JSON y contiene métricas como Accuracy
                             const jsonDiv = document.createElement('div');
-                            jsonDiv.innerHTML = `
-                                <div style="background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                    <h3 style="color: #FF9800;">Resultado en JSON</h3>
-                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(salida.contenido, null, 2)}</pre>
-                                </div>
-                            `;
+                            if (salida.contenido.toLowerCase().includes("accuracy")) {
+                                jsonDiv.innerHTML = `
+                                    <div style="background-color: #e8f5e9; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #81C784;">Métricas de Performance (Accuracy)</h3>
+                                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(salida.contenido, null, 2)}</pre>
+                                    </div>
+                                `;
+                            }
                             contentDiv.appendChild(jsonDiv);
                         }
                     });
+                } else if (cell.tipo === 'markdown') {
+                    // Para cualquier celda Markdown, la mostramos directamente
+                    const markdownDiv = document.createElement('div');
+                    markdownDiv.innerHTML = `
+                        <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                            <h3 style="color: #757575;">Texto Markdown:</h3>
+                            <pre style="white-space: pre-wrap; word-wrap: break-word;">${cell.contenido}</pre>
+                        </div>
+                    `;
+                    contentDiv.appendChild(markdownDiv);
                 }
             });
         })
