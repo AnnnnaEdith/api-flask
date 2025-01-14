@@ -1,7 +1,18 @@
 // Función que se ejecuta cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
     fetchNotebooksList();
+    adjustContentHeight();
+    window.addEventListener('resize', adjustContentHeight);
 });
+
+// Función para ajustar el tamaño del contenido a la ventana
+function adjustContentHeight() {
+    const contentDiv = document.getElementById('content');
+    const windowHeight = window.innerHeight;
+    const offsetTop = contentDiv.getBoundingClientRect().top;
+    contentDiv.style.height = `${windowHeight - offsetTop - 20}px`;
+    contentDiv.style.overflow = 'auto';
+}
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
@@ -37,8 +48,11 @@ function fetchNotebookContent(notebookName) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar solo las salidas de las celdas
+            // Mostrar contenido de las celdas
             data.forEach(cell => {
+                const cellDiv = document.createElement('div');
+                cellDiv.style.marginBottom = '15px';
+
                 if (cell.tipo === 'código') {
                     cell.salidas.forEach(salida => {
                         const salidaDiv = document.createElement('div');
@@ -48,7 +62,7 @@ function fetchNotebookContent(notebookName) {
                             `;
                         } else if (salida.tipo === 'imagen') {
                             salidaDiv.innerHTML = `
-                                <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>
+                                <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida" style="max-width: 100%; height: auto;"/>
                             `;
                         } else if (salida.tipo === 'json') {
                             salidaDiv.innerHTML = `
@@ -59,12 +73,21 @@ function fetchNotebookContent(notebookName) {
                                 <div>${salida.contenido}</div>
                             `;
                         }
-                        contentDiv.appendChild(salidaDiv);
+                        cellDiv.appendChild(salidaDiv);
                     });
+                } else if (cell.tipo === 'texto') {
+                    cellDiv.innerHTML = `
+                        <div style="font-style: italic; background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">
+                            ${cell.contenido}
+                        </div>
+                    `;
                 }
+
+                contentDiv.appendChild(cellDiv);
             });
         })
         .catch(error => {
             console.error('Error al obtener el contenido del notebook:', error);
         });
 }
+
