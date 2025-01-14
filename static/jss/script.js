@@ -37,46 +37,31 @@ function fetchNotebookContent(notebookName) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar el contenido de las celdas
+            // Mostrar solo las salidas de las celdas
             data.forEach(cell => {
-                const cellDiv = document.createElement('div');
                 if (cell.tipo === 'código') {
-                    cellDiv.innerHTML = `
-                        <strong>Celda de Código:</strong>
-                        <pre>${cell.contenido}</pre>
-                    `;
-
-                    // Mostrar las salidas
                     cell.salidas.forEach(salida => {
+                        const salidaDiv = document.createElement('div');
                         if (salida.tipo === 'texto') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (Texto):</strong>
+                            salidaDiv.innerHTML = `
                                 <pre>${salida.contenido}</pre>
                             `;
                         } else if (salida.tipo === 'imagen') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (Imagen):</strong>
+                            salidaDiv.innerHTML = `
                                 <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>
                             `;
                         } else if (salida.tipo === 'json') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (JSON):</strong>
+                            salidaDiv.innerHTML = `
                                 <pre>${JSON.stringify(salida.contenido, null, 2)}</pre>
                             `;
                         } else if (salida.tipo === 'html') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (HTML):</strong>
+                            salidaDiv.innerHTML = `
                                 <div>${salida.contenido}</div>
                             `;
                         }
+                        contentDiv.appendChild(salidaDiv);
                     });
-                } else if (cell.tipo === 'texto') {
-                    cellDiv.innerHTML = `
-                        <strong>Celda de Markdown:</strong>
-                        <pre>${cell.contenido}</pre>
-                    `;
                 }
-                contentDiv.appendChild(cellDiv);
             });
         })
         .catch(error => {
