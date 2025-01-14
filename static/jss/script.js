@@ -55,7 +55,7 @@ function fetchNotebookContent(notebookName) {
             `;
             contentDiv.appendChild(titleDiv);
 
-            let foundAccuracy = false;
+            let foundF1Score = false;
             let foundDataInfo = false;
 
             // Procesamos cada celda
@@ -65,17 +65,17 @@ function fetchNotebookContent(notebookName) {
                     // Si hay salidas, procesamos cada tipo de salida
                     cell.salidas.forEach(salida => {
                         if (salida.tipo === 'texto') {
-                            // Buscamos si el texto contiene "accuracy"
-                            if (salida.contenido.toLowerCase().includes("accuracy")) {
-                                const accuracyDiv = document.createElement('div');
-                                accuracyDiv.innerHTML = `
+                            // Buscamos si el texto contiene "F1-score"
+                            if (salida.contenido.toLowerCase().includes("f1-score")) {
+                                const f1scoreDiv = document.createElement('div');
+                                f1scoreDiv.innerHTML = `
                                     <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                        <h3 style="color: #4CAF50;">Exactitud (Accuracy)</h3>
+                                        <h3 style="color: #4CAF50;">F1-Score</h3>
                                         <p>${salida.contenido}</p>
                                     </div>
                                 `;
-                                contentDiv.appendChild(accuracyDiv);
-                                foundAccuracy = true;
+                                contentDiv.appendChild(f1scoreDiv);
+                                foundF1Score = true;
                             }
 
                             // Buscamos la cantidad de datos
@@ -106,14 +106,14 @@ function fetchNotebookContent(notebookName) {
             });
 
             // Si no se encuentra ninguno de los datos, informamos al usuario
-            if (!foundAccuracy) {
-                const noAccuracyDiv = document.createElement('div');
-                noAccuracyDiv.innerHTML = `
+            if (!foundF1Score) {
+                const noF1ScoreDiv = document.createElement('div');
+                noF1ScoreDiv.innerHTML = `
                     <div style="background-color: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                        <h3 style="color: #856404;">No se encontró información de Accuracy.</h3>
+                        <h3 style="color: #856404;">No se encontró información de F1-Score.</h3>
                     </div>
                 `;
-                contentDiv.appendChild(noAccuracyDiv);
+                contentDiv.appendChild(noF1ScoreDiv);
             }
 
             if (!foundDataInfo) {
@@ -131,3 +131,4 @@ function fetchNotebookContent(notebookName) {
             console.error('Error al obtener el contenido del notebook:', error);
         });
 }
+
