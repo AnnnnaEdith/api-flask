@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('https://api-flask-gmko.onrender.com/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
@@ -36,22 +36,30 @@ function fetchNotebooksList() {
 
 // Función para obtener el contenido de un notebook
 function fetchNotebookContent(notebookName) {
-    fetch(`https://api-flask-gmko.onrender.com/documentos/contenido/${notebookName}`)
+    fetch(`https://api-flask-1-rdir.onrender.com/documentos/contenido/${notebookName}`)
         .then(response => response.json())
         .then(data => {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
+
+            // Títulos para distinguir entre los dos documentos
+            const titleDiv = document.createElement('div');
+            titleDiv.innerHTML = `
+                <h2 style="text-align: center; color: #333;">Resultados de: ${notebookName}</h2>
+            `;
+            contentDiv.appendChild(titleDiv);
 
             // Procesar las celdas
             data.forEach(cell => {
                 if (cell.tipo === 'código') {
                     // Mostrar solo las salidas relevantes
                     cell.salidas.forEach(salida => {
-                        if (salida.tipo === 'texto' && salida.contenido.includes("accuracy")) {
+                        // Verificar que se incluya el resultado en base al tipo de documento
+                        if (salida.tipo === 'texto' && salida.contenido.toLowerCase().includes("accuracy")) {
                             const accuracyDiv = document.createElement('div');
                             accuracyDiv.innerHTML = `
                                 <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                    <h3 style="color: #4CAF50;">Resultado de Accuracy</h3>
+                                    <h3 style="color: #4CAF50;">Exactitud (Accuracy)</h3>
                                     <p>${salida.contenido}</p>
                                 </div>
                             `;
@@ -65,7 +73,7 @@ function fetchNotebookContent(notebookName) {
                                 </div>
                             `;
                             contentDiv.appendChild(imageDiv);
-                        } else if (salida.tipo === 'texto' && salida.contenido.includes("matriz de confusión")) {
+                        } else if (salida.tipo === 'texto' && salida.contenido.toLowerCase().includes("matriz de confusión")) {
                             const matrixDiv = document.createElement('div');
                             matrixDiv.innerHTML = `
                                 <div style="background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 5px;">
