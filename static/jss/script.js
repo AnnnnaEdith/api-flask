@@ -1,5 +1,5 @@
 // Función que se ejecuta cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     fetchNotebooksList();
 });
 
@@ -49,43 +49,58 @@ function fetchNotebookContent(notebookName) {
             `;
             contentDiv.appendChild(titleDiv);
 
-            // Procesar las celdas
+            // Procesar las celdas según el notebook
             data.forEach(cell => {
                 if (cell.tipo === 'código') {
-                    // Mostrar las salidas relevantes
-                    cell.salidas.forEach(salida => {
-                        if (salida.tipo === 'texto') {
-                            // Texto relevante, como el accuracy
-                            const textDiv = document.createElement('div');
-                            textDiv.innerHTML = `
-                                <div style="background-color: #f0f8ff; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                    <h3 style="color: #4CAF50;">Resultado Texto</h3>
-                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${salida.contenido}</pre>
-                                </div>
-                            `;
-                            contentDiv.appendChild(textDiv);
-                        } else if (salida.tipo === 'imagen') {
-                            // Imágenes (gráficos generados)
-                            const imageDiv = document.createElement('div');
-                            imageDiv.innerHTML = `
-                                <div style="text-align: center; margin: 10px 0;">
-                                    <h3 style="color: #2196F3;">Gráfico Generado</h3>
-                                    <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida" style="max-width: 100%; border: 1px solid #ddd; border-radius: 5px; padding: 5px;"/>
-                                </div>
-                            `;
-                            contentDiv.appendChild(imageDiv);
-                        } else if (salida.tipo === 'json') {
-                            // JSON (formatos de salida complejos)
-                            const jsonDiv = document.createElement('div');
-                            jsonDiv.innerHTML = `
-                                <div style="background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                    <h3 style="color: #FF9800;">Resultado en JSON</h3>
-                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(salida.contenido, null, 2)}</pre>
-                                </div>
-                            `;
-                            contentDiv.appendChild(jsonDiv);
-                        }
-                    });
+                    // Análisis de Sentimiento: Importación y contador
+                    if (notebookName.toLowerCase().includes('análisis-de-sentimiento')) {
+                        cell.salidas.forEach(salida => {
+                            if (salida.tipo === 'texto' && salida.contenido.toLowerCase().includes("importación del dataset")) {
+                                const datasetDiv = document.createElement('div');
+                                datasetDiv.innerHTML = `
+                                    <div style="background-color: #f0f8ff; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #4CAF50;">Resultado: Importación del Dataset</h3>
+                                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${salida.contenido}</pre>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(datasetDiv);
+                            } else if (salida.tipo === 'texto' && salida.contenido.toLowerCase().includes("contador de sentimientos")) {
+                                const counterDiv = document.createElement('div');
+                                counterDiv.innerHTML = `
+                                    <div style="background-color: #fffbe0; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #FF9800;">Resultado: Contador de Sentimientos</h3>
+                                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${salida.contenido}</pre>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(counterDiv);
+                            }
+                        });
+                    }
+
+                    // Árboles de Decisión: Accuracy y Gráficas
+                    if (notebookName.toLowerCase().includes('árboles-de-decision')) {
+                        cell.salidas.forEach(salida => {
+                            if (salida.tipo === 'texto' && salida.contenido.toLowerCase().includes("accuracy")) {
+                                const accuracyDiv = document.createElement('div');
+                                accuracyDiv.innerHTML = `
+                                    <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #4CAF50;">Exactitud (Accuracy)</h3>
+                                        <p>${salida.contenido}</p>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(accuracyDiv);
+                            } else if (salida.tipo === 'imagen') {
+                                const imageDiv = document.createElement('div');
+                                imageDiv.innerHTML = `
+                                    <div style="text-align: center; margin: 10px 0;">
+                                        <h3 style="color: #2196F3;">Gráfico Generado</h3>
+                                        <img src="data:image/png;base64,${salida.contenido}" alt="Gráfico de Árbol de Decisión" style="max-width: 100%; border: 1px solid #ddd; border-radius: 5px; padding: 5px;"/>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(imageDiv);
+                            }
+                        });
+                    }
                 }
             });
         })
