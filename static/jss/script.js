@@ -37,46 +37,37 @@ function fetchNotebookContent(notebookName) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar el contenido de las celdas
+            // Mostrar solo las salidas y celdas de texto
             data.forEach(cell => {
-                const cellDiv = document.createElement('div');
-                if (cell.tipo === 'código') {
-                    cellDiv.innerHTML = `
-                        <strong>Celda de Código:</strong>
+                if (cell.tipo === 'texto') {
+                    const textCellDiv = document.createElement('div');
+                    textCellDiv.innerHTML = `
                         <pre>${cell.contenido}</pre>
                     `;
-
-                    // Mostrar las salidas
+                    contentDiv.appendChild(textCellDiv);
+                } else if (cell.tipo === 'código') {
                     cell.salidas.forEach(salida => {
+                        const outputDiv = document.createElement('div');
                         if (salida.tipo === 'texto') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (Texto):</strong>
+                            outputDiv.innerHTML = `
                                 <pre>${salida.contenido}</pre>
                             `;
                         } else if (salida.tipo === 'imagen') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (Imagen):</strong>
+                            outputDiv.innerHTML = `
                                 <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>
                             `;
                         } else if (salida.tipo === 'json') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (JSON):</strong>
+                            outputDiv.innerHTML = `
                                 <pre>${JSON.stringify(salida.contenido, null, 2)}</pre>
                             `;
                         } else if (salida.tipo === 'html') {
-                            cellDiv.innerHTML += `
-                                <strong>Salida (HTML):</strong>
+                            outputDiv.innerHTML = `
                                 <div>${salida.contenido}</div>
                             `;
                         }
+                        contentDiv.appendChild(outputDiv);
                     });
-                } else if (cell.tipo === 'texto') {
-                    cellDiv.innerHTML = `
-                        <strong>Celda de Markdown:</strong>
-                        <pre>${cell.contenido}</pre>
-                    `;
                 }
-                contentDiv.appendChild(cellDiv);
             });
         })
         .catch(error => {
