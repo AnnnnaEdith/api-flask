@@ -1,4 +1,4 @@
-#!/home/anaed/Documentos/UNIVERSIDAD/5TO/Simulacion/ProFin/venv/bin/python3
+#!/home/anaed/Documentos/UNIVERSIDAD/5TO/Simulacion/ProFin/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
