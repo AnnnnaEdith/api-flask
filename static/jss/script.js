@@ -56,6 +56,7 @@ function fetchNotebookContent(notebookName) {
             contentDiv.appendChild(titleDiv);
 
             let foundF1Score = false;
+            let foundAccuracy = false;
 
             // Procesamos cada celda
             data.forEach(cell => {
@@ -75,6 +76,18 @@ function fetchNotebookContent(notebookName) {
                                 `;
                                 contentDiv.appendChild(f1scoreDiv);
                                 foundF1Score = true;
+                            }
+                            // Buscamos si el texto contiene "accuracy"
+                            if (salida.contenido.toLowerCase().includes("accuracy")) {
+                                const accuracyDiv = document.createElement('div');
+                                accuracyDiv.innerHTML = `
+                                    <div style="background-color: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                        <h3 style="color: #2196F3;">Resultado Accuracy</h3>
+                                        <p>${salida.contenido}</p>
+                                    </div>
+                                `;
+                                contentDiv.appendChild(accuracyDiv);
+                                foundAccuracy = true;
                             }
                         } else if (salida.tipo === 'imagen') {
                             // Si la salida es una imagen (gráfico), la mostramos
@@ -100,6 +113,17 @@ function fetchNotebookContent(notebookName) {
                     </div>
                 `;
                 contentDiv.appendChild(noF1ScoreDiv);
+            }
+
+            // Si no se encuentra información de Accuracy, informamos al usuario
+            if (!foundAccuracy) {
+                const noAccuracyDiv = document.createElement('div');
+                noAccuracyDiv.innerHTML = `
+                    <div style="background-color: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                        <h3 style="color: #856404;">No se encontró información de Accuracy.</h3>
+                    </div>
+                `;
+                contentDiv.appendChild(noAccuracyDiv);
             }
 
         })
