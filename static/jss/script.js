@@ -1,18 +1,7 @@
 // Función que se ejecuta cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
     fetchNotebooksList();
-    adjustContentHeight();
-    window.addEventListener('resize', adjustContentHeight);
 });
-
-// Función para ajustar el tamaño del contenido a la ventana
-function adjustContentHeight() {
-    const contentDiv = document.getElementById('content');
-    const windowHeight = window.innerHeight;
-    const offsetTop = contentDiv.getBoundingClientRect().top;
-    contentDiv.style.height = `${windowHeight - offsetTop - 20}px`;
-    contentDiv.style.overflow = 'auto';
-}
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
@@ -48,46 +37,34 @@ function fetchNotebookContent(notebookName) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = ''; // Limpiar contenido previo
 
-            // Mostrar contenido de las celdas
+            // Mostrar únicamente los resultados y las celdas de Markdown
             data.forEach(cell => {
-                const cellDiv = document.createElement('div');
-                cellDiv.style.marginBottom = '15px';
-
-                if (cell.tipo === 'código') {
+                if (cell.tipo === 'texto') {
+                    // Celda de Markdown
+                    const markdownDiv = document.createElement('div');
+                    markdownDiv.innerHTML = `<div><strong>Markdown:</strong></div><pre>${cell.contenido}</pre>`;
+                    contentDiv.appendChild(markdownDiv);
+                } else if (cell.tipo === 'código') {
+                    // Mostrar únicamente las salidas de las celdas de código
                     cell.salidas.forEach(salida => {
                         const salidaDiv = document.createElement('div');
-                        if (salida.tipo === 'texto') {
-                            salidaDiv.innerHTML = `
-                                <pre>${salida.contenido}</pre>
-                            `;
-                        } else if (salida.tipo === 'imagen') {
-                            salidaDiv.innerHTML = `
-                                <img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida" style="max-width: 100%; height: auto;"/>
-                            `;
-                        } else if (salida.tipo === 'json') {
-                            salidaDiv.innerHTML = `
-                                <pre>${JSON.stringify(salida.contenido, null, 2)}</pre>
-                            `;
-                        } else if (salida.tipo === 'html') {
-                            salidaDiv.innerHTML = `
-                                <div>${salida.contenido}</div>
-                            `;
-                        }
-                        cellDiv.appendChild(salidaDiv);
-                    });
-                } else if (cell.tipo === 'texto') {
-                    cellDiv.innerHTML = `
-                        <div style="font-style: italic; background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">
-                            ${cell.contenido}
-                        </div>
-                    `;
-                }
 
-                contentDiv.appendChild(cellDiv);
+                        if (salida.tipo === 'texto') {
+                            salidaDiv.innerHTML = `<div><strong>Salida (Texto):</strong></div><pre>${salida.contenido}</pre>`;
+                        } else if (salida.tipo === 'imagen') {
+                            salidaDiv.innerHTML = `<div><strong>Salida (Imagen):</strong></div><img src="data:image/png;base64,${salida.contenido}" alt="Imagen de salida"/>`;
+                        } else if (salida.tipo === 'json') {
+                            salidaDiv.innerHTML = `<div><strong>Salida (JSON):</strong></div><pre>${JSON.stringify(salida.contenido, null, 2)}</pre>`;
+                        } else if (salida.tipo === 'html') {
+                            salidaDiv.innerHTML = `<div><strong>Salida (HTML):</strong></div><div>${salida.contenido}</div>`;
+                        }
+
+                        contentDiv.appendChild(salidaDiv);
+                    });
+                }
             });
         })
         .catch(error => {
             console.error('Error al obtener el contenido del notebook:', error);
         });
 }
-
