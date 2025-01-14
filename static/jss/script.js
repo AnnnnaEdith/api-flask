@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para obtener la lista de notebooks desde la API
 function fetchNotebooksList() {
-    fetch('http://127.0.0.1:5000/documentos')
+    fetch('https://api-flask-1-rdir.onrender.com/documentos')
         .then(response => response.json())
         .then(data => {
             const notebooksList = document.getElementById('notebooks-list');
