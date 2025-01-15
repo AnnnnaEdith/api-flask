@@ -1,54 +1,80 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color:darkviolet;
+    font-family: 'Poppins', Arial, sans-serif; /* Cambié a Poppins para una apariencia más moderna */
+    background-color: #f3f4f6; /* Un fondo claro y limpio */
     margin: 0;
     padding: 0;
+    line-height: 1.6;
+    color: #2c3e50; /* Un tono oscuro pero suave para el texto */
 }
 
 .container {
     max-width: 1200px;
     margin: 50px auto;
-    background-color: rgb(235, 111, 222);
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff; /* Blanco puro para un fondo limpio */
+    padding: 30px;
+    border-radius: 10px; /* Bordes redondeados para un diseño más atractivo */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Una sombra más suave */
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #34495e; /* Un tono ligeramente más oscuro para resaltar el título */
+    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
 ul {
     list-style-type: none;
-    padding: 5;
-    margin-left: 10px;
-    margin-left: 40px;
+    padding: 0;
+    margin: 20px 0;
 }
 
 ul li {
-    background-color: #c9f3ef;
+    background-color: #e1f5fe; /* Un tono azul claro y refrescante */
     margin: 10px 0;
-    padding: 10px;
+    padding: 15px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    border-radius: 8px; /* Más redondeado para una apariencia amigable */
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: bold;
+    color: #34495e;
 }
 
 ul li:hover {
-    background-color: #c9f3ef;
+    background-color: #81d4fa; /* Un azul más vivo al pasar el cursor */
+    transform: scale(1.05); /* Un ligero aumento en tamaño para destacar */
 }
 
 #notebook-content {
-    margin-top: 20px;
-    padding-top: 10px;
-    border-top: 1px solid #c9f3ef;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 2px dashed #bdc3c7; /* Líneas discontinuas para un diseño estilizado */
 }
 
 #content {
     white-space: pre-wrap;
     word-wrap: break-word;
-    background-color: #c9f3ef;
-    padding: 20px;
-    border-radius: 5px;
+    background-color: #fdfefe; /* Fondo claro pero separado del principal */
+    padding: 25px;
+    border-radius: 8px;
     font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    border: 1px solid #dfe6e9; /* Borde claro para separación */
+}
+
+/* Añadiendo una animación al contenido */
+ul li, #content {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
